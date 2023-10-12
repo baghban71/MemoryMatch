@@ -8,8 +8,18 @@ const { ccclass, property } = _decorator;
 @ccclass('TilesHandler')
 export class TilesHandler extends Component {
 
+
+    @property(Node)
+    topLeft: Node = null;
+
+    @property(Node)
+    downRights: Node = null;
+
     @property(Node)
     canvasNode: Node = null;
+
+    @property(Node)
+    tilesHolder: Node = null;
 
     @property(Prefab)
     tilePrefab: Prefab = null;
@@ -20,7 +30,10 @@ export class TilesHandler extends Component {
     spriteFrames: SpriteFrame[] = [];
 
     @property(CCInteger)
-    tileCount: number = 0;
+    columns: number = 0;
+
+    @property(CCInteger)
+    rows: number = 0;
 
     // 4,9,16,25
     // 6,8,10,12,14,16,18,20,22,24,26,28,30
@@ -29,9 +42,14 @@ export class TilesHandler extends Component {
 
     canCheck: boolean = false;
 
+    canChangePos: boolean = false;
+
+    tileDemision: number = 100;
+    disanceFromLeft: number = 75;
+
     Reset() {
         let idCounter = 0;
-
+        let MAX_TILE_COUNT = this.columns * this.rows;
 
         this.tiles.forEach(element => {
             element.active = false;
@@ -44,9 +62,10 @@ export class TilesHandler extends Component {
         this.selectedTiles = [null, null];
         Events.eventTarget.emit('Tile:canSelect', false);
 
-        for (var i = 0; i < this.tileCount; i++) {
+        for (var i = 0; i < MAX_TILE_COUNT; i++) {
 
-            let a = ObjectPool.getInstance().GetPooledObject(this.canvasNode, 0);
+            let a = ObjectPool.getInstance().GetPooledObject(this.tilesHolder, 0);
+            //this.tilesHolder.addChild(a);
             let tileComp = a.getComponent(Tile);
 
             //a.setScale(0.001, 0.001, 1);
@@ -57,14 +76,15 @@ export class TilesHandler extends Component {
             tileScript.spriteIndex = this.getRandomInt(this.spriteFrames.length);
             tileScript.centerSprite.spriteFrame = this.spriteFrames[tileScript.spriteIndex];
 
-           // tileScript.show();
+            // tileScript.show();
 
             this.tiles.push(a);
+
         };
 
         //console.log(this.tiles.length);
-        this.node.getComponent(TilesPosition).setPos();
-
+        this.node.getComponent(TilesPosition).setPos(this.columns, this.rows, this.tileDemision);
+        //this.canChangePos = true;
         setTimeout(() => {
             this.ToFace(true);
         }, 500);
@@ -94,10 +114,6 @@ export class TilesHandler extends Component {
         this.tiles = [];
         let scaleFactor = 0.5;
 
-
-
-
-
         Events.eventTarget.on('allToFace', (toFace: boolean) => {
             this.ToFace(toFace);
 
@@ -123,7 +139,7 @@ export class TilesHandler extends Component {
                     this.selectedTiles[1] = null;
                 }, 1000);
                 //console.log("Hello Turn!", this.selectedTiles[0], this.selectedTiles[1], tile.isBack, tile.id, tile.spriteIndex);
-               // console.log(this.selectedTiles[0].spriteIndex, this.selectedTiles[1].spriteIndex);
+                // console.log(this.selectedTiles[0].spriteIndex, this.selectedTiles[1].spriteIndex);
             }
         }, this);
 
@@ -151,7 +167,26 @@ export class TilesHandler extends Component {
     getRandomInt(max) {
         return Math.floor(Math.random() * max);
     }
-    // update(deltaTime: number) {
+    update(deltaTime: number) {
+        // if (!this.canChangePos)
+        //   return;
+        var tlPos = this.topLeft.getPosition();
+        var drPos = this.downRights.getPosition();
+        var width = Math.abs(tlPos.x) + Math.abs(drPos.x);
+        var height = Math.abs(tlPos.y) + Math.abs(drPos.y);
+        var widthMid = (tlPos.x + drPos.x);
+        var heightMid = (drPos.y + tlPos.y);
+        var totalTilesWidth = this.columns * (this.tileDemision + 12.5);//4x = 450;
+        var totalTilesHeight = this.rows * (this.tileDemision + 12.5);//4x =450;
+        var xScaleFactor = width / totalTilesWidth;
+        var yScaleFactor = height / totalTilesHeight;
 
-    // }
+
+        this.tilesHolder.setPosition(widthMid + this.disanceFromLeft, heightMid, 0);
+
+        if (xScaleFactor < yScaleFactor)
+            this.tilesHolder.setWorldScale(xScaleFactor, xScaleFactor, 1);
+        else
+            this.tilesHolder.setWorldScale(yScaleFactor, yScaleFactor, 1);
+    }
 }

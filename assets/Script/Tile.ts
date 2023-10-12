@@ -67,6 +67,7 @@ export class Tile extends Component {
                 scale: new Vec3(0.01, this.scaleFactor, this.scaleFactor)                     // Bind scale
             }).call(() => {
                 if (this.isBack) {
+                   
                     this.bgSprite.spriteFrame = this.front;
                     this.centerSprite.enabled = true;
                 } else {
@@ -98,7 +99,7 @@ export class Tile extends Component {
 
     show() {
         this.node.active = true;
-        //this.node.setScale(0.01, 0.01, 1)
+        //this.node.setScale(0.01, 0.01, 1);
         tween(this.node)
             .to(this.showHideTweenLength, {
                 scale: new Vec3(this.scaleFactor, this.scaleFactor, 1)                     // Bind scale

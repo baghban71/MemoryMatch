@@ -16,21 +16,23 @@ export class TilesPosition extends Component {
 
     }
 
-    setPos() {
+    setPos(columns, rows, tileDemision) {
         let scaleFactor = 0.5;
         let index = 0;
- 
-        for (var i = 0; i < Math.pow(this.tilesHandler.tileCount, 0.5); i++) {
-            for (var j = 0; j < Math.pow(this.tilesHandler.tileCount, 0.5); j++) {
+        var xDiff = ((columns - 1) * tileDemision) / 2;
+        var yDiff = ((rows - 1) * tileDemision) / 2;
+        for (var i = 0; i < columns; i++) {
+            for (var j = 0; j < rows; j++) {
                 let a = this.tilesHandler.tiles[index];
+                this.tilesHandler.tiles[index].active = true;
                 index++;
-                a.setPosition(i * 100, j * 100, 0);
+                a.setPosition((i * tileDemision) - xDiff, (j * tileDemision) - yDiff, 0);
                 a.setScale(scaleFactor, scaleFactor, 1);
                 a.getComponent(Tile).scaleFactor = scaleFactor;
             }
         }
-    }
 
+    }
 
     // update(deltaTime: number) {
     // }

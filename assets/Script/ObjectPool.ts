@@ -29,12 +29,12 @@ export class ObjectPool extends Component {
     }
 
 
-    public GetPooledObject = function (parent,prefabTypeInt) {
+    public GetPooledObject = function (parent, prefabTypeInt) {
 
         for (var i = 0; i < this.pooledObjects[prefabTypeInt].length; i++) {
 
-            if (!this.pooledObjects[prefabTypeInt][i].enabled) {
-                this.pooledObjects[prefabTypeInt][i].enabled = true;
+            if (!this.pooledObjects[prefabTypeInt][i].active) {
+                this.pooledObjects[prefabTypeInt][i].active = true;
                 return this.pooledObjects[prefabTypeInt][i];
             }
 
@@ -48,7 +48,12 @@ export class ObjectPool extends Component {
         return instance;
     };
 
+    public DisableAll = function (prefabTypeInt) {
 
+        for (var i = 0; i < this.pooledObjects[prefabTypeInt].length; i++)
+            this.pooledObjects[prefabTypeInt][i].active = false;
+
+    };
 }
 
 

@@ -1,16 +1,28 @@
-import { _decorator, Component, Event, Input, Label, Sprite } from 'cc';
+import { _decorator, Component, Event, Input, Label, Node, Sprite } from 'cc';
 import { TilesHandler } from './TilesHandler';
 import { Events } from './Events';
 import { Tile } from './Tile';
+import { ObjectPool } from './ObjectPool';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
 export class GameManager extends Component {
 
 
+    @property(Node)
+    mainMenu: Node = null;
+
+    @property(Sprite)
+    backBtnSprite: Sprite = null;
+
+    @property(Sprite)
+    helpBtnSprite: Sprite = null;
 
     @property(Sprite)
     resetBtnSprite: Sprite = null;
+
+    @property(Sprite)
+    playBtnSprite: Sprite = null;
 
     @property(Label)
     faceLableBtn: Label = null;
@@ -18,10 +30,16 @@ export class GameManager extends Component {
     @property(Label)
     backLableBtn: Label = null;
 
-
     canReset: boolean = true;
 
-    start() {
+
+
+    tilesHandler: TilesHandler = null;
+
+
+    protected onLoad(): void {
+
+        this.tilesHandler = this.node.getComponent(TilesHandler);
 
         Events.eventTarget.on('reset', () => {
             this.restart();
@@ -40,6 +58,7 @@ export class GameManager extends Component {
             }, 2000);
         }, this);
 
+
         this.faceLableBtn.node.on(Input.EventType.TOUCH_START, () => {
 
             Events.eventTarget.emit('allToFace', true);
@@ -48,6 +67,63 @@ export class GameManager extends Component {
         this.backLableBtn.node.on(Input.EventType.TOUCH_START, () => {
             Events.eventTarget.emit('allToFace', false);
         }, this);
+
+
+        this.backBtnSprite.node.on(Input.EventType.TOUCH_START, () => {
+            this.setGamePlayItemState(false);
+        }, this);
+
+
+        Events.eventTarget.on('play', (index) => {
+            switch (index) {
+                case 0:
+                    this.tilesHandler.columns = 3;
+                    this.tilesHandler.rows = 2;
+                    break;
+                case 1:
+                    this.tilesHandler.columns = 4;
+                    this.tilesHandler.rows = 3;
+                    break;
+                case 2:
+                    this.tilesHandler.columns = 6;
+                    this.tilesHandler.rows = 3;
+                    break;
+            }
+
+            this.tilesHandler.Reset();
+           
+
+            this.setGamePlayItemState(true);
+        });
+    }
+    start() {
+
+        this.setGamePlayItemState(false);
+
+
+    }
+    setGamePlayItemState(state) {
+
+        if (state) {
+            setTimeout(() => {
+                this.backBtnSprite.node.active = state;
+                this.helpBtnSprite.node.active = state;
+            }, 4000);
+        } else {
+            this.backBtnSprite.node.active = state;
+            this.helpBtnSprite.node.active = state;
+        }
+
+        if (!state) {
+            this.tilesHandler.ToFace(false);
+
+            setTimeout(() => {
+                ObjectPool.getInstance().DisableAll(0);
+                this.mainMenu.active = !state;
+
+            }, 500);
+
+        }
 
 
     }
