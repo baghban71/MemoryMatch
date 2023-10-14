@@ -55,6 +55,21 @@ export class TilesHandler extends Component {
             element.active = false;
         });
 
+        let bigArr = [];
+        for (var i = 0; i < this.spriteFrames.length; i++)
+            bigArr[i] = i;
+        this.shuffle(bigArr);
+
+        let arr = [];
+        for (var i = 0; i < (MAX_TILE_COUNT / 2); i++)
+            arr[i] = bigArr[i];
+
+        let arr2 = [...this.shuffle(arr)];
+        this.shuffle(arr2);
+
+        arr = arr.concat(arr2);
+
+       // console.log(arr);
 
         this.tiles = [];
 
@@ -73,7 +88,7 @@ export class TilesHandler extends Component {
             tileComp.id = idCounter++;
 
             let tileScript = a.getComponent(Tile);
-            tileScript.spriteIndex = this.getRandomInt(this.spriteFrames.length);
+            tileScript.spriteIndex = arr[i];
             tileScript.centerSprite.spriteFrame = this.spriteFrames[tileScript.spriteIndex];
 
             // tileScript.show();
@@ -188,5 +203,27 @@ export class TilesHandler extends Component {
             this.tilesHolder.setWorldScale(xScaleFactor, xScaleFactor, 1);
         else
             this.tilesHolder.setWorldScale(yScaleFactor, yScaleFactor, 1);
+    }
+
+
+
+    shuffle(array) {
+        let currentIndex = array.length,
+            randomIndex;
+
+        // While there remain elements to shuffle...
+        while (currentIndex != 0) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            // And swap it with the current element.
+            [array[currentIndex], array[randomIndex]] = [
+                array[randomIndex], array[currentIndex]
+            ];
+        }
+
+        return array;
     }
 }
