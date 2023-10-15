@@ -38,7 +38,7 @@ export class Tile extends Component {
         this.isBack = true;
         this.centerSprite.enabled = false;
         this.bgSprite.spriteFrame = this.back;
-        this.node.setScale(0.1, 0.1, 0.1);
+       // this.node.setScale(0.1, 0.1, 0.1);
     }
 
     start() {
@@ -52,10 +52,12 @@ export class Tile extends Component {
     }
 
     onTouch() {
-       // console.log(this.spriteIndex );
+        // console.log(this.spriteIndex );
 
-        if (!this.canSelect ||  !this.isBack)
+        if (!this.canSelect || !this.isBack)
             return;
+
+        Events.eventTarget.emit('Tile:onTouchTurn');
 
         this.turn();
     }
@@ -67,7 +69,7 @@ export class Tile extends Component {
                 scale: new Vec3(0.01, this.scaleFactor, this.scaleFactor)                     // Bind scale
             }).call(() => {
                 if (this.isBack) {
-                   
+
                     this.bgSprite.spriteFrame = this.front;
                     this.centerSprite.enabled = true;
                 } else {
@@ -99,14 +101,14 @@ export class Tile extends Component {
 
     show() {
         this.node.active = true;
-        //this.node.setScale(0.01, 0.01, 1);
-        tween(this.node)
+        this.node.setScale(1, 1, 1);
+       /* tween(this.node)
             .to(this.showHideTweenLength, {
                 scale: new Vec3(this.scaleFactor, this.scaleFactor, 1)                     // Bind scale
             }).call(() => {
                 this.node.active = true;
                 // hide message
-            }).start();
+            }).start();*/
     }
     // update(deltaTime: number) {
 

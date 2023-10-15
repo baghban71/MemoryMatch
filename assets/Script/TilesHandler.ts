@@ -69,7 +69,7 @@ export class TilesHandler extends Component {
 
         arr = arr.concat(arr2);
 
-       // console.log(arr);
+        // console.log(arr);
 
         this.tiles = [];
 
@@ -99,15 +99,20 @@ export class TilesHandler extends Component {
 
         //console.log(this.tiles.length);
         this.node.getComponent(TilesPosition).setPos(this.columns, this.rows, this.tileDemision);
+
+        Events.eventTarget.emit('TilesHandler:onAllTilesCreated');
+
+
         //this.canChangePos = true;
         setTimeout(() => {
             this.ToFace(true);
+            Events.eventTarget.emit('TilesHandler:onAllTilesCreatedAnToFace');
         }, 500);
         setTimeout(() => {
             this.ToFace(false);
             this.canCheck = true;
             Events.eventTarget.emit('Tile:canSelect', true);
-        }, 2000);
+        }, 5000);
 
     }
 
@@ -162,9 +167,12 @@ export class TilesHandler extends Component {
     }
 
     checkCorrection() {
+        if (this.selectedTiles[0] == null || this.selectedTiles[1] == null)
+            return;
         let isCorrect = this.selectedTiles[0].spriteIndex == this.selectedTiles[1].spriteIndex;
         if (this.selectedTiles[0] != null && this.selectedTiles[1] != null) {
             Events.eventTarget.emit("isCorrect", isCorrect, this.selectedTiles[0], this.selectedTiles[1]);
+            Events.eventTarget.emit("TilesHandler:isCorrect", isCorrect);
 
             if (isCorrect) {
                 this.selectedTiles[0].hide();

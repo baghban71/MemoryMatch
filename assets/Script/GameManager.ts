@@ -74,6 +74,11 @@ export class GameManager extends Component {
         }, this);
 
 
+        Events.eventTarget.on('ResourceLoader:onAllSpritesLoded', (sprites) => {
+            this.tilesHandler.spriteFrames = sprites;
+        });
+
+
         Events.eventTarget.on('play', (index) => {
             switch (index) {
                 case 0:
@@ -91,7 +96,7 @@ export class GameManager extends Component {
             }
 
             this.tilesHandler.Reset();
-           
+
 
             this.setGamePlayItemState(true);
         });
@@ -108,7 +113,7 @@ export class GameManager extends Component {
             setTimeout(() => {
                 this.backBtnSprite.node.active = state;
                 this.helpBtnSprite.node.active = state;
-            }, 4000);
+            }, 5500);
         } else {
             this.backBtnSprite.node.active = state;
             this.helpBtnSprite.node.active = state;
