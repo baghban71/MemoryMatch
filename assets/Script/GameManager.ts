@@ -1,4 +1,4 @@
-import { _decorator, Component, Event, Input, Label, Node, Sprite } from 'cc';
+import { _decorator, Button, Component, Event, Input, Label, Node, Sprite } from 'cc';
 import { TilesHandler } from './TilesHandler';
 import { Events } from './Events';
 import { Tile } from './Tile';
@@ -8,6 +8,8 @@ const { ccclass, property } = _decorator;
 @ccclass('GameManager')
 export class GameManager extends Component {
 
+    @property(Node)
+    close_btn: Node = null;
 
     @property(Node)
     mainMenu: Node = null;
@@ -32,10 +34,7 @@ export class GameManager extends Component {
 
     canReset: boolean = true;
 
-
-
     tilesHandler: TilesHandler = null;
-
 
     protected onLoad(): void {
 
@@ -44,9 +43,14 @@ export class GameManager extends Component {
         Events.eventTarget.on('reset', () => {
             this.restart();
         });
-        Events.eventTarget.on('isCorrect', (isCorrect: boolean) => {
-
+        Events.eventTarget.on('TilesHandler:isCorrect', (isCorrect: boolean) => {
+            let activeTiles = this.getActiveTiles();
+            if (isCorrect && activeTiles.length <= 2) {
+              //  console.log("----[[ Game Over");
+                this.win();
+            }
         });
+
 
         this.resetBtnSprite.node.on(Input.EventType.TOUCH_START, () => {
             if (!this.canReset)
@@ -71,7 +75,13 @@ export class GameManager extends Component {
 
         this.backBtnSprite.node.on(Input.EventType.TOUCH_START, () => {
             this.setGamePlayItemState(false);
+            Events.eventTarget.emit('onBackBtnClick');
         }, this);
+
+        this.close_btn.on(Input.EventType.TOUCH_START, () => {
+            this.close();
+        }, this);
+
 
 
         Events.eventTarget.on('ResourceLoader:onAllSpritesLoded', (sprites) => {
@@ -107,6 +117,29 @@ export class GameManager extends Component {
 
 
     }
+    close() {
+        if (window.ReactNativeWebView != undefined)
+            window.ReactNativeWebView.postMessage(JSON.stringify({ key: "closeClicked" }));
+
+
+    }
+
+    win() {
+        if (window.ReactNativeWebView != undefined)
+            window.ReactNativeWebView.postMessage(JSON.stringify({ key: "onWin" }));
+    }
+
+    getActiveTiles() {
+        let activeTiles = [];
+        this.tilesHandler.tiles.forEach(element => {
+            if (element.active)
+                activeTiles.push(element);
+
+        });
+        return activeTiles;
+    }
+
+
     setGamePlayItemState(state) {
 
         if (state) {

@@ -10,6 +10,10 @@ export class MainMenu extends Component {
     selectedIndex: Number = 0;
 
     protected onLoad(): void {
+
+
+
+
         Events.eventTarget.on('onDifficultySelect', (index) => {
             this.selectedIndex = index;
         });
@@ -22,6 +26,15 @@ export class MainMenu extends Component {
     }
 
     start() {
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        let state: number = 0;
+        if (urlParams.has("state")) {
+            state = +urlParams.get('state');
+        }
+        Events.eventTarget.emit('onDifficultySelect', state);
+
     }
 
 }

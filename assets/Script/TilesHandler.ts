@@ -45,7 +45,7 @@ export class TilesHandler extends Component {
     canChangePos: boolean = false;
 
     tileDemision: number = 100;
-    disanceFromLeft: number = 75;
+    disanceFromLeft: number = 50;
 
     Reset() {
         let idCounter = 0;
@@ -142,12 +142,12 @@ export class TilesHandler extends Component {
             this.canCheck = !toFace;
         });
 
-        Events.eventTarget.on('turn', (tile: Tile) => {
+        Events.eventTarget.on('Tile:onTouch', (tile: Tile) => {
             if (!this.canCheck)
                 return;
-            if (!tile.isBack && this.selectedTiles[0] == null) {
+            if (this.selectedTiles[0] == null) {
                 this.selectedTiles[0] = tile;
-            } else if (!tile.isBack && this.selectedTiles[1] == null) {
+            } else if (this.selectedTiles[1] == null) {
                 this.selectedTiles[1] = tile;
                 Events.eventTarget.emit('Tile:canSelect', false);
                 setTimeout(() => {
@@ -161,6 +161,12 @@ export class TilesHandler extends Component {
                 //console.log("Hello Turn!", this.selectedTiles[0], this.selectedTiles[1], tile.isBack, tile.id, tile.spriteIndex);
                 // console.log(this.selectedTiles[0].spriteIndex, this.selectedTiles[1].spriteIndex);
             }
+            //console.log(this.selectedTiles[0], this.selectedTiles[1])
+        });
+
+        Events.eventTarget.on('turn', (tile: Tile) => {
+
+
         }, this);
 
         // return ball.getComponent('Ball');
@@ -174,10 +180,11 @@ export class TilesHandler extends Component {
             Events.eventTarget.emit("isCorrect", isCorrect, this.selectedTiles[0], this.selectedTiles[1]);
             Events.eventTarget.emit("TilesHandler:isCorrect", isCorrect);
 
+
             if (isCorrect) {
                 this.selectedTiles[0].hide();
                 this.selectedTiles[1].hide();
-
+                //Events.eventTarget.emit('TilesHandler:onCorrectTilesSelect', this.selectedTiles[0].spriteIndex);
             } else {
                 this.selectedTiles[0].turn();
                 this.selectedTiles[1].turn();

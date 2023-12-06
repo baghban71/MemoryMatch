@@ -4,7 +4,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('ToggleGroup')
 export class ToggleGroup extends Component {
-    start() {
+    protected onLoad(): void {
         const containerEventHandler = new EventHandler();
         // This Node is the node to which your event processing code component belongs
         containerEventHandler.target = this.node;
@@ -15,7 +15,13 @@ export class ToggleGroup extends Component {
 
         const container = this.node.getComponent(ToggleContainerComponent);
         container.checkEvents.push(containerEventHandler);
-        Events.eventTarget.emit('onDifficultySelect', 0);
+
+        Events.eventTarget.on('onDifficultySelect', (index) => {
+            container.toggleItems[index].isChecked = true;
+        });
+    }
+    start() {
+
 
     }
 
